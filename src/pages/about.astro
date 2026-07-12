@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactCTA from '../components/ContactCTA.astro';
+import Tag from '../components/Tag.astro';
+
+const skillGroups = [
+  {
+    name: 'Research',
+    items: ['User interviews', 'Contextual inquiry', 'Usability testing', 'Survey design', 'Funnel analysis'],
+  },
+  {
+    name: 'Design',
+    items: ['Interaction design', 'Design systems', 'Prototyping', 'Service blueprints', 'Accessibility (WCAG 2.2)'],
+  },
+  {
+    name: 'Tools',
+    items: ['Figma', 'Maze', 'Lookback', 'Amplitude', 'Fullstory', 'Miro', 'Notion'],
+  },
+  {
+    name: 'Working languages',
+    items: ['English (fluent)', 'Romanian (native)', 'Danish (conversational)', 'German (learning, A2)'],
+  },
+];
+---
+
+<BaseLayout
+  title="About — Adelina Sahlean"
+  description="UX designer with eight years in fintech, health, and B2B products, relocating from Copenhagen to Switzerland."
+>
+  <section class="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-24">
+    <div class="grid gap-12 lg:grid-cols-[1fr_320px] lg:gap-16">
+      <div>
+        <h1 class="font-display text-4xl font-bold tracking-tight">About</h1>
+
+        <div class="mt-8 space-y-5 text-lg text-ink/85">
+          <p>
+            I'm Adelina — a UX designer who likes the messy middle of product work:
+            the part after "we should improve this" and before anyone knows what
+            "this" is. I've spent eight years there, mostly in small teams at
+            fintech, health, and B2B companies where the designer does the research,
+            makes the case, and ships the thing.
+          </p>
+          <p>
+            I grew up in Cluj, studied interaction design in Malmö, and have spent
+            the last six years in Copenhagen. The way I work is recognizably
+            Scandinavian: flat teams, direct feedback, decisions written down. I've
+            noticed that translates well to Swiss product culture — precision about
+            problems, skepticism toward decoration.
+          </p>
+          <p>
+            Away from work: I climb (badly), bake rye bread (well), and keep a
+            sketchbook of transit-system diagrams from every city I visit.
+          </p>
+        </div>
+
+        <h2 class="mt-14 font-display text-2xl font-bold tracking-tight">
+          What I'm looking for
+        </h2>
+        <div class="mt-5 space-y-5 text-lg text-ink/85">
+          <p>
+            I'm relocating to Switzerland — a long-planned move, not an experiment,
+            with family already in Basel. I'm looking for a senior product design
+            role in Zürich, Basel, or Lausanne, in a team where design has a seat in
+            decisions and researchers aren't a luxury. Available from
+            <strong>early 2027</strong>, EU citizen (Romanian passport), so the
+            permit process is straightforward.
+          </p>
+          <p>
+            If you're weighing the risk of a relocating candidate: I've done this
+            move before (Romania → Sweden → Denmark), I interview happily on CET
+            hours, and I can be in Switzerland for a final round within a week.
+          </p>
+        </div>
+
+        <h2 class="mt-14 font-display text-2xl font-bold tracking-tight">
+          Skills and tools
+        </h2>
+        <div class="mt-6 grid gap-8 sm:grid-cols-2">
+          {
+            skillGroups.map((group) => (
+              <div>
+                <h3 class="text-sm font-medium text-moss-deep">{group.name}</h3>
+                <ul class="mt-3 flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <li>
+                      <Tag>{item}</Tag>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <aside class="lg:pt-20">
+        <div
+          class="mx-auto flex aspect-[4/5] max-w-xs items-center justify-center rounded-card bg-oat"
+          role="img"
+          aria-label="Portrait of Adelina Sahlean"
+        >
+          <p class="px-6 text-center text-sm text-ink/50">[ Photo: Adelina, portrait ]</p>
+        </div>
+        <dl class="mt-8 space-y-4 text-sm">
+          <div>
+            <dt class="font-medium text-moss-deep">Currently</dt>
+            <dd class="mt-1">Copenhagen, Denmark</dd>
+          </div>
+          <div>
+            <dt class="font-medium text-moss-deep">Relocating to</dt>
+            <dd class="mt-1">Zürich / Basel / Lausanne</dd>
+          </div>
+          <div>
+            <dt class="font-medium text-moss-deep">Available</dt>
+            <dd class="mt-1">Early 2027 · EU citizen</dd>
+          </div>
+          <div>
+            <dt class="font-medium text-moss-deep">Experience</dt>
+            <dd class="mt-1">8 years · fintech, health, B2B</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <ContactCTA />
+</BaseLayout>

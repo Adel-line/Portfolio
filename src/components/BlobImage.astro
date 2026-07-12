@@ -1,0 +1,46 @@
+---
+/**
+ * Blob-cropped thumbnail. Until real project imagery exists it renders
+ * a styled placeholder; pass `src` later to swap in a real image with
+ * no layout change.
+ */
+interface Props {
+  alt: string;
+  blob?: 'blob-1' | 'blob-2' | 'blob-3' | 'blob-4';
+  tone?: 'oat' | 'moss' | 'rust';
+  src?: string;
+  class?: string;
+}
+
+const { alt, blob = 'blob-1', tone = 'oat', src, class: className } = Astro.props;
+
+const tones = {
+  oat: 'bg-oat',
+  moss: 'bg-moss/30',
+  rust: 'bg-rust/20',
+};
+---
+
+<div class:list={['overflow-hidden', blob, tones[tone], className]}>
+  {
+    src ? (
+      <img src={src} alt={alt} class="h-full w-full object-cover" loading="lazy" />
+    ) : (
+      <svg
+        role="img"
+        aria-label={alt}
+        viewBox="0 0 400 300"
+        class="h-full w-full"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <rect width="400" height="300" fill="transparent" />
+        <circle cx="290" cy="80" r="70" fill="#A8532E" opacity="0.25" />
+        <path d="M0 230 Q100 170 200 220 T400 200 V300 H0 Z" fill="#6B7A52" opacity="0.3" />
+        <rect x="70" y="90" width="130" height="86" rx="14" fill="#F3ECDF" opacity="0.85" />
+        <rect x="86" y="108" width="72" height="9" rx="4.5" fill="#2B2420" opacity="0.5" />
+        <rect x="86" y="126" width="98" height="9" rx="4.5" fill="#2B2420" opacity="0.28" />
+        <rect x="86" y="148" width="44" height="12" rx="6" fill="#A8532E" opacity="0.7" />
+      </svg>
+    )
+  }
+</div>

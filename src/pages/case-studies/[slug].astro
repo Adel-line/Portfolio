@@ -1,0 +1,28 @@
+---
+import { getCollection, render } from 'astro:content';
+import CaseStudyLayout from '../../layouts/CaseStudyLayout.astro';
+import PullQuote from '../../components/PullQuote.astro';
+import ImageFigure from '../../components/ImageFigure.astro';
+import Compare from '../../components/Compare.astro';
+
+export async function getStaticPaths() {
+  const studies = (await getCollection('case-studies')).sort(
+    (a, b) => a.data.order - b.data.order
+  );
+  return studies.map((study, i) => ({
+    params: { slug: study.id },
+    props: {
+      study,
+      prev: i > 0 ? studies[i - 1] : undefined,
+      next: i < studies.length - 1 ? studies[i + 1] : undefined,
+    },
+  }));
+}
+
+const { study, prev, next } = Astro.props;
+const { Content } = await render(study);
+---
+
+<CaseStudyLayout study={study} prev={prev} next={next}>
+  <Content components={{ PullQuote, ImageFigure, Compare }} />
+</CaseStudyLayout>

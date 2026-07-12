@@ -1,0 +1,103 @@
+---
+title: 'Halving missed appointments for a clinic scheduling platform'
+outcome: 'Rebuilt booking and reminders cut patient no-shows from 19% to 9% across 40 clinics.'
+client: 'Klinika (B2B2C health scheduling)'
+role: 'Senior product designer (one of two)'
+timeframe: 'Aug–Dec 2024 · 18 weeks'
+tools: ['Figma', 'Lookback', 'Metabase', 'Miro']
+tags: ['Health', 'Service design', 'Research']
+featured: true
+order: 2
+blob: 'blob-2'
+thumbAlt: 'Appointment booking calendar interface for the Klinika platform'
+---
+
+## Context
+
+Klinika sells scheduling software to private physiotherapy and dental clinics
+across the Nordics. Clinics were churning, and exit interviews kept surfacing
+the same number: patient no-shows sat at 19%, and clinics blamed the software's
+booking and reminder experience. I shared the project with one other designer;
+I owned the patient-facing side, she owned the clinic admin side, and we met in
+the middle weekly.
+
+## The problem, precisely
+
+No-shows are a service problem wearing a UI costume, so we resisted jumping to
+screens. Four weeks of research across six clinics — shadowing receptionists,
+call logs, and 15 patient interviews — broke the 19% into causes:
+
+- **~8 points: reminders people never saw.** SMS reminders went out 24 hours
+  ahead from an unrecognizable sender number, and only in one language.
+- **~6 points: appointments people couldn't move.** Rescheduling required
+  calling during office hours. Patients who couldn't attend often just... didn't.
+- **~5 points: appointments people forgot they'd made.** Bookings made by a
+  receptionist on the patient's behalf never reached the patient's calendar.
+
+<PullQuote attribution="Receptionist, Aarhus physiotherapy clinic">
+  Monday mornings I spend an hour calling people who booked three weeks ago and
+  forgot we exist.
+</PullQuote>
+
+That decomposition became the roadmap. Each cause got its own intervention,
+shippable independently — important for a two-designer team at a company that
+releases every two weeks.
+
+## Process
+
+We ran the three interventions as a sequence, cheapest first:
+
+1. **Reminder rewrite (weeks 1–3).** Sender name instead of a number, patient's
+   language, and a second reminder 3 hours before with a one-tap "I'm coming /
+   I need to move it" response. No new screens — mostly copy and timing.
+2. **Self-serve rescheduling (weeks 4–10).** The reminder's "move it" tap opens
+   a slot picker scoped to the same practitioner. The design challenge was the
+   clinic side: practitioners feared patients shuffling their calendar chaos.
+   We added clinic-configurable rescheduling windows, tested with 5 clinic
+   managers before a line of code.
+3. **Calendar handoff (weeks 11–14).** Every booking — including ones made at
+   the front desk — generates a calendar invite. Boring, unglamorous, five
+   points of no-shows.
+
+<ImageFigure
+  alt="Service blueprint mapping patient, receptionist, and system actions from booking to appointment day"
+  caption="The service blueprint we kept on the wall for four months. UI screens are the thin bottom row; most of the fix lived in the rows above."
+  tone="moss"
+/>
+
+## Decisions and reasoning
+
+**We said no to an app.** Leadership wanted a patient app; retention logic
+seemed obvious. But our research said patients interact with a clinic 4–6 times
+a year — nobody installs an app for that. Everything shipped over SMS and web,
+no login required, magic-link auth for rescheduling. The decision doc for this
+"no" is the artifact from this project I'm proudest of.
+
+**Rescheduling limits were a negotiation, not a setting.** Early designs let
+patients rebook freely; pilot clinics revolted within days. The shipped version
+defaults to "up to 24h before, same practitioner, twice per appointment" —
+found by iterating with clinic managers, not by A/B testing patients. B2B2C
+means designing for the customer *and* the user, and being honest about when
+they conflict.
+
+<Compare
+  beforeAlt="Original SMS reminder from an unknown number with no action options"
+  afterAlt="Redesigned reminder with clinic name, patient language, and one-tap confirm or reschedule"
+  beforeLabel="Old reminder"
+  afterLabel="Shipped reminder"
+  caption="Most of the impact came from the humblest artifact in the project: a text message."
+/>
+
+## Outcome
+
+Measured across 40 pilot clinics over 12 weeks, against a matched control group:
+
+- No-shows: **19% → 9%**
+- 71% of rescheduling now self-serve, saving front desks ~4 hours a week
+- Clinic churn in the pilot group fell by a third the following quarter
+- The reminder rewrite alone — three weeks of work — accounted for nearly half
+  the improvement
+
+The lesson I carry forward: decompose the metric before designing anything.
+The 19% was never one problem, and treating it as one would have produced a
+prettier booking flow and roughly the same no-show rate.

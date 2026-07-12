@@ -1,0 +1,101 @@
+---
+title: 'Cutting onboarding drop-off by 40% at a consumer fintech'
+outcome: 'Redesigned KYC onboarding lifted completed sign-ups from 43% to 61% in eight weeks.'
+client: 'Nordpay (consumer fintech, ~200k users)'
+role: 'Lead product designer'
+timeframe: 'Jan–Apr 2025 · 14 weeks'
+tools: ['Figma', 'Maze', 'Amplitude', 'Notion']
+tags: ['Fintech', 'Onboarding', 'Mobile']
+featured: true
+order: 1
+blob: 'blob-1'
+thumbAlt: 'Mobile onboarding screens for the Nordpay sign-up flow'
+---
+
+## Context
+
+Nordpay is a Copenhagen-based payments app. Growth was healthy at the top of the
+funnel — around 30,000 sign-up starts a month — but only 43% of people who began
+onboarding ever made their first transaction. Marketing was paying for users the
+product then lost. I was brought in as the only designer on a squad of five to
+own the onboarding flow end to end.
+
+## The problem, precisely
+
+"Improve onboarding" is not a brief. The first two weeks went into narrowing it:
+
+- Amplitude funnels showed two dominant drop points: the ID verification step
+  (−31%) and the "link your bank" step (−18%).
+- Support tickets told us *why* for one of them: people didn't have their
+  passport at hand and the flow offered no way back in. Abandoning meant
+  starting over.
+- Twelve user interviews added the second reason: the bank-linking screen asked
+  for credentials before explaining what Nordpay would do with them. Several
+  participants used the word "phishing."
+
+<PullQuote attribution="Interview participant, week 2">
+  This is the screen where I'd text my brother and ask if this app is legit.
+</PullQuote>
+
+So the reframed problem: **the flow demanded trust and documents before it had
+earned or explained either.**
+
+## Process
+
+I mapped the existing 14-screen flow against the two questions users were
+actually asking — "what do I get?" and "what do you take?" — and found the flow
+answered neither before screen 9.
+
+<ImageFigure
+  alt="Annotated flow map of the original 14-screen onboarding, with drop-off percentages marked at each step"
+  caption="The original flow, annotated with funnel data. Red markers show the two steps responsible for 49 points of drop-off."
+  tone="rust"
+/>
+
+Three design bets came out of that mapping, each cheap to test separately:
+
+1. **Reorder, don't redesign.** Let people into a read-only version of the app
+   before KYC, moving verification to the moment they first add money — when
+   motivation is highest.
+2. **Make leaving safe.** Save progress server-side and send a resume link, so
+   "I'll do this when I find my passport" stops meaning "never."
+3. **Explain before asking.** A single plain-language screen before bank
+   linking: what we access, what we never see, who regulates us.
+
+I tested all three as separate Maze prototypes with 8 users each rather than
+one big redesign — when a combined prototype wins, you don't know which change
+did the work.
+
+## Decisions and reasoning
+
+**The hard argument was bet #1.** Compliance initially read "KYC later" as "KYC
+optional," which it isn't. We spent a week with the legal team mapping exactly
+which actions require verified identity under Danish AML rules, and found
+browsing rates and seeing the fee calculator required none. The final flow
+verifies identity at first deposit — later, but not optional. This is the kind
+of constraint negotiation I'd rather show than hide: the design only worked
+because the compliance conversation happened.
+
+**I killed my favorite idea.** An animated progress companion tested well for
+delight but added 11 seconds median to the flow and two participants asked if
+it was "a kids' app." Charm lost to speed, correctly.
+
+<Compare
+  beforeAlt="Original bank-linking screen asking for credentials with no explanation"
+  afterAlt="Redesigned screen explaining data access and regulation before the credential form"
+  caption="The bank-linking step, before and after. The rewrite added one screen and removed the single largest trust objection."
+/>
+
+## Outcome
+
+Eight weeks after launch, measured on the same Amplitude funnel:
+
+- Completed onboarding: **43% → 61%** (the headline 40% relative lift)
+- Resume-link emails recovered **9%** of abandoners within 72 hours
+- "Is this safe/legit" support tickets down **56%**
+- Time-to-first-transaction unchanged — we moved verification later without
+  slowing activation
+
+What I'd do differently: start the compliance conversation in week 1, not week
+5. The legal constraints turned out to be the real design material, and I lost
+a month treating them as a review step instead of an input.

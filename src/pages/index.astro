@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import CaseStudyCard from '../components/CaseStudyCard.astro';
+import ProcessSnapshot from '../components/ProcessSnapshot.astro';
+import AboutTeaser from '../components/AboutTeaser.astro';
+import ContactCTA from '../components/ContactCTA.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+
+const featured = (await getCollection('case-studies', ({ data }) => data.featured)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+
+<BaseLayout
+  title="Adelina Sahlean — UX designer, Copenhagen → Switzerland"
+  description="UX designer with eight years in fintech, health, and B2B products. Relocating to Switzerland; available for roles in Zürich, Basel, and Lausanne."
+>
+  <Hero />
+
+  <section class="mx-auto max-w-5xl scroll-mt-20 px-5 py-20 sm:px-8" id="work" aria-labelledby="work-heading">
+    <SectionHeading eyebrow="Selected work" id="work-heading">
+      Three projects, with the reasoning shown
+    </SectionHeading>
+    <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+      {featured.map((study) => <CaseStudyCard study={study} />)}
+    </div>
+  </section>
+
+  <ProcessSnapshot />
+  <AboutTeaser />
+  <ContactCTA />
+</BaseLayout>

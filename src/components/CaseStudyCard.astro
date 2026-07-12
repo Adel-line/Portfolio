@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BlobImage from './BlobImage.astro';
+import Tag from './Tag.astro';
+
+interface Props {
+  study: CollectionEntry<'case-studies'>;
+}
+
+const { study } = Astro.props;
+const { title, outcome, tags, blob, thumbAlt } = study.data;
+const href = `/case-studies/${study.id}/`;
+
+const tones = ['oat', 'moss', 'rust'] as const;
+const tone = tones[study.data.order % tones.length];
+---
+
+<article class="group relative">
+  <BlobImage
+    alt={thumbAlt}
+    blob={blob}
+    tone={tone}
+    class="aspect-[4/3] transition-transform duration-200 group-hover:scale-[1.015]"
+  />
+  <div class="mt-5">
+    <h3 class="font-display text-xl font-bold tracking-tight">
+      <a
+        href={href}
+        class="transition-colors duration-200 after:absolute after:inset-0 after:content-[''] group-hover:text-rust"
+      >
+        {title}
+      </a>
+    </h3>
+    <p class="mt-2 text-ink/75">{outcome}</p>
+    <ul class="mt-4 flex flex-wrap gap-2" aria-label="Project tags">
+      {
+        tags.map((tag) => (
+          <li>
+            <Tag>{tag}</Tag>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</article>

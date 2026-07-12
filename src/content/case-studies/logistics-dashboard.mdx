@@ -1,0 +1,108 @@
+---
+title: 'One dashboard instead of five tools for freight dispatchers'
+outcome: 'Consolidated dispatch console cut average decision time per shipment from 6 minutes to under 2.'
+client: 'Fraktflow (B2B logistics SaaS)'
+role: 'Product designer, embedded in platform team'
+timeframe: 'Feb–Jun 2024 · 16 weeks'
+tools: ['Figma', 'FigJam', 'Fullstory', 'Linear']
+tags: ['B2B', 'Dashboards', 'Complexity']
+featured: true
+order: 3
+blob: 'blob-3'
+thumbAlt: 'Freight dispatch dashboard showing shipment queue and exception panel'
+---
+
+## Context
+
+Fraktflow makes software for mid-size freight forwarders. Dispatchers — the
+people deciding which carrier moves which shipment — were working across five
+surfaces: Fraktflow's own queue, two carrier portals, a rate spreadsheet, and
+email. The company wanted a "control tower" dashboard. I was embedded in the
+platform team for four months to figure out what that actually meant.
+
+## The problem, precisely
+
+I started with contextual inquiry: two full days sitting with dispatchers at
+three customer sites, screen-recording (with consent) and timestamping their
+work. The pattern was consistent and specific:
+
+- A dispatcher handles **60–90 shipments a day**; roughly 80% are routine and
+  take seconds.
+- The other 20% are *exceptions* — a delayed pickup, a rate discrepancy, a
+  customs flag — and each one cost **5–8 minutes of tool-switching** to
+  assemble enough context to decide.
+- Fullstory confirmed it at scale: the median "exception journey" touched 4
+  surfaces and included a copy-paste into email 70% of the time.
+
+The reframe that shaped everything: dispatchers didn't need a dashboard for
+all shipments. They needed the **exception cases to arrive pre-assembled.**
+
+<PullQuote attribution="Dispatcher, customer site visit, day 2">
+  I don't need to see the 70 green ones. Show me the six that are on fire and
+  everything I need to put each one out.
+</PullQuote>
+
+## Process
+
+I wrote the core design principle on the first page of the spec: *every
+exception must be resolvable from a single screen.* Then worked backwards:
+
+1. **Inventory the decisions.** From the site-visit recordings I catalogued 14
+   recurring exception types and, for each, the exact data needed to resolve it
+   (carrier ETA, rate delta, customer SLA, contact). This spreadsheet, not a
+   wireframe, was the project's first deliverable.
+2. **Design the exception card.** One expandable card per exception, with the
+   needed data pulled from the source systems and the two or three plausible
+   actions as buttons — rebook, escalate, notify customer — instead of a
+   copy-paste into email.
+3. **Test with real mess.** We prototyped with each pilot customer's own
+   shipment data, not clean demo data. Fake data hides the layout-breaking
+   realities: 40-character consignee names, triple-digit rate discrepancies,
+   exceptions arriving in bursts of 20.
+
+<ImageFigure
+  alt="Exception card design showing shipment context, rate comparison, and resolution actions in one panel"
+  caption="The exception card. Everything a dispatcher previously gathered from four tools, assembled before they open it."
+  tone="oat"
+/>
+
+## Decisions and reasoning
+
+**Density was a feature, not a flaw.** My early layouts used the generous
+spacing I'd default to in consumer work; dispatchers hated them. They scan
+grids all day and wanted more rows per screen, not fewer. We settled on a
+compact table with a strict "one glance" hierarchy — status color, then
+exception type, then age — after three rounds of testing with actual
+dispatchers rather than trusting my taste. Calm design isn't sparse design; in
+an expert tool, information you have to scroll for is information hidden.
+
+**We shipped the queue before the intelligence.** Engineering flagged that
+live carrier-data integration was two quarters of risk. Instead of blocking on
+it, v1 pre-assembled exceptions from data Fraktflow already had and left a
+clearly-marked "open carrier portal" link for the rest. Imperfect and shippable
+beat complete and hypothetical; the integration followed in v2 with the layout
+unchanged.
+
+<Compare
+  beforeAlt="Dispatcher workflow diagram spanning five tools with copy-paste steps highlighted"
+  afterAlt="Same workflow resolved within a single exception card"
+  beforeLabel="Old workflow"
+  afterLabel="Shipped workflow"
+  caption="The five-surface exception journey, collapsed into one."
+/>
+
+## Outcome
+
+Measured with the same Fullstory instrumentation, eight weeks post-launch
+across four pilot customers:
+
+- Median exception decision time: **6.1 minutes → 1.8 minutes**
+- Tool switches per exception: **4 → 1.3**
+- Copy-paste-into-email rate: **70% → 12%**
+- Two pilot customers expanded their licenses the following quarter, citing
+  dispatcher throughput in the renewal call
+
+What I'd do differently: bring engineering to the site visits. The two
+engineers who eventually watched the recordings redesigned their own API
+priorities afterwards — that alignment in week 2 instead of week 9 would have
+saved a sprint of building the wrong integration first.
