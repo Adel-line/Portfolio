@@ -3,31 +3,58 @@ interface Props {
   href?: string;
   type?: 'button' | 'submit';
   variant?: 'primary' | 'secondary' | 'ghost';
+  disabled?: boolean;
   class?: string;
 }
 
-const { href, type = 'button', variant = 'primary', class: className } = Astro.props;
+const { href, type = 'button', variant = 'primary', disabled = false, class: className } = Astro.props;
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-button px-6 py-3 text-sm font-medium transition-all duration-200';
+  'group/btn inline-flex items-center justify-center gap-2 rounded-button font-display text-sm font-semibold transition-all duration-200';
 
 const variants = {
-  primary: 'bg-rust text-linen hover:bg-rust-deep hover:scale-[1.02] active:scale-100',
-  secondary: 'bg-moss text-linen hover:bg-moss-deep hover:scale-[1.02] active:scale-100',
-  ghost: 'text-rust border border-rust/40 hover:border-rust hover:bg-rust/5',
+  primary:
+    'bg-gradient-brand shadow-accent-soft px-6 py-3 text-white hover:-translate-y-px active:translate-y-0',
+  secondary:
+    'border-[1.5px] border-border-strong bg-transparent px-6 py-3 text-primary hover:border-accent',
+  ghost: 'gap-1.5 text-accent',
 };
 
-const classes = [base, variants[variant], className];
+const disabledClasses = disabled
+  ? 'cursor-not-allowed opacity-40 shadow-none hover:translate-y-0 hover:border-border-strong'
+  : '';
+
+const classes = [base, variants[variant], disabledClasses, className];
 ---
 
 {
   href ? (
-    <a href={href} class:list={classes}>
+    <a
+      href={disabled ? undefined : href}
+      aria-disabled={disabled || undefined}
+      class:list={classes}
+    >
       <slot />
+      {variant === 'ghost' && (
+        <span
+          class="transition-transform duration-200 group-hover/btn:translate-x-1"
+          aria-hidden="true"
+        >
+          →
+        </span>
+      )}
     </a>
   ) : (
-    <button type={type} class:list={classes}>
+    <button type={type} disabled={disabled} class:list={classes}>
       <slot />
+      {variant === 'ghost' && (
+        <span
+          class="transition-transform duration-200 group-hover/btn:translate-x-1"
+          aria-hidden="true"
+        >
+          →
+        </span>
+      )}
     </button>
   )
 }

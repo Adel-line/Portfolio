@@ -13,9 +13,10 @@ npm run preview  # serve the build locally
 
 ## Where things live
 
-- **Design tokens** — `src/styles/global.css`. Colors (`linen`, `ink`, `rust`, `moss`, `oat`), fonts, type scale, and the blob-crop utilities are all defined in the `@theme` block (Tailwind v4 style, no `tailwind.config`). The dusk-wash gradient is a `:root` custom property used only by the homepage hero — keep it that way.
+- **Design tokens** — `src/styles/global.css`. Semantic colors (`bg`, `surface`, `text-primary/secondary/tertiary`, `border`, `accent`, …) are CSS custom properties scoped to `data-theme="light" | "dark"` on `<html>`, mapped to Tailwind utilities in the `@theme inline` block (Tailwind v4 style, no `tailwind.config`). Fonts: Syne (display/headings/labels), Spectral (body, italic for pull quotes), JetBrains Mono (tags, captions, data, code). The brand gradient (`--gradient-brand`) is reserved for the hero glow, primary buttons, the nav Resume button, and card glyphs — never a full-bleed background. Theme choice persists in `localStorage` and falls back to `prefers-color-scheme`.
 - **Case studies** — `src/content/case-studies/*.mdx`. Adding a project = adding one MDX file; frontmatter schema is in `src/content.config.ts`. Inside MDX you can use `<PullQuote>`, `<ImageFigure>`, and `<Compare>` without imports (they're injected in `src/pages/case-studies/[slug].astro`).
-- **Placeholder images** — `BlobImage`, `ImageFigure`, and `Compare` render styled placeholders until you pass a `src`; alt text and captions are already wired, so swapping in real imagery is a prop change per instance.
+- **Placeholder images** — `ImageFigure` and `Compare` render styled placeholders until you pass a `src`; alt text and captions are already wired, so swapping in real imagery is a prop change per instance.
+- **Resume** — the nav's Resume button links to `/resume.pdf`; drop the PDF into `public/` to make it live.
 - **Motion** — one GSAP hero entrance (`src/scripts/hero-entrance.ts`); everything else is CSS transitions. `prefers-reduced-motion` disables all of it.
 
 ## Supabase integration point (next pass)

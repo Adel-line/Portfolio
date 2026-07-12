@@ -1,25 +1,81 @@
 @import "tailwindcss";
 
 /*
-  Design tokens — "Nordic warmth"
-  Colors, fonts, and type scale live here so components never
-  reach for one-off hex values or ad hoc sizes.
+  Design tokens — site-wide design system.
+  Semantic colors live as theme-scoped custom properties, switched via
+  data-theme="light" | "dark" on <html> (set before first paint in
+  BaseLayout). Components consume them through the Tailwind mappings in
+  the @theme inline block, never via one-off hex values.
 */
-@theme {
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #faf8f4;
+  --bg-elevated: #ffffff;
+  --surface: #ffffff;
+  --surface-sunken: #f2efe8;
+  --text-primary: #1b1812;
+  --text-secondary: #63594b;
+  --text-tertiary: #948a78;
+  --border: #e7e1d4;
+  --border-strong: #d2caba;
+  /* Darkened from the palette's #C7500F (4.32:1 on --bg) to meet WCAG AA
+     4.5:1 for small accent text on every light surface. */
+  --accent: #b8490d;
+  --nav-bg: rgba(255, 255, 255, 0.65);
+  --nav-border: rgba(27, 24, 18, 0.08);
+  --code-bg: #1b1812;
+  --code-text: #f2eee4;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141210;
+  --bg-elevated: #1c1916;
+  --surface: #1c1916;
+  --surface-sunken: #100e0c;
+  --text-primary: #f5f1e8;
+  --text-secondary: #b4ab9b;
+  --text-tertiary: #7c7365;
+  --border: #322c24;
+  --border-strong: #443c31;
+  --accent: #ff7a3d;
+  --nav-bg: rgba(28, 25, 22, 0.55);
+  --nav-border: rgba(245, 241, 232, 0.1);
+  --code-bg: #0f0d0b;
+  --code-text: #f2eee4;
+}
+
+:root {
+  /* Shared across both themes. Never full-bleed: mask or constrain it
+     (hero glow, primary buttons, nav Resume button, card glyphs). */
+  --gradient-brand: linear-gradient(135deg, #e8601c 0%, #d63f6e 55%, #6c3aa6 100%);
+}
+
+/* Tailwind utility mappings — `inline` so utilities resolve the var()
+   at use-time and follow the data-theme switch. */
+@theme inline {
   /* Colors */
-  --color-linen: #f3ecdf;
-  --color-ink: #2b2420;
-  --color-rust: #a8532e;
-  --color-rust-deep: #8a4223;
-  --color-moss: #6b7a52;
-  --color-moss-deep: #566342;
-  --color-oat: #d9c8a9;
-  --color-oat-light: #e9ddc6;
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-code-bg: var(--code-bg);
+  --color-code-text: var(--code-text);
 
   /* Fonts */
-  --font-display: "Familjen Grotesk", "Avenir Next", "Segoe UI", sans-serif;
-  --font-body: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Syne", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "Spectral", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
 
+@theme {
   /* Type scale — matched line-heights, real contrast reserved for hero/openers */
   --text-xs: 0.8125rem;
   --text-xs--line-height: 1.5;
@@ -40,20 +96,25 @@
   --text-display: clamp(2.625rem, 5.5vw + 1rem, 4.25rem);
   --text-display--line-height: 1.05;
 
-  /* Soft-rounded look */
-  --radius-card: 1.25rem;
+  /* Radii */
+  --radius-card: 1.75rem;
   --radius-button: 999px;
 }
 
-:root {
-  /* Reserved for exactly one moment: the homepage hero. */
-  --gradient-dusk: linear-gradient(135deg, #e8a66e 0%, #c4767a 45%, #7e88a8 100%);
+/* Brand gradient as a background — the only sanctioned way to use it */
+@utility bg-gradient-brand {
+  background-image: var(--gradient-brand);
+}
+
+/* Accent-tinted soft shadow for primary buttons */
+@utility shadow-accent-soft {
+  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--accent) 60%, transparent);
 }
 
 html {
   font-family: var(--font-body);
-  background-color: var(--color-linen);
-  color: var(--color-ink);
+  background-color: var(--bg);
+  color: var(--text-primary);
   scroll-behavior: smooth;
 }
 
@@ -65,31 +126,21 @@ body {
 
 /* Visible, consistent keyboard focus on every interactive element */
 :focus-visible {
-  outline: 3px solid var(--color-rust);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 4px;
 }
 
 ::selection {
-  background-color: color-mix(in srgb, var(--color-rust) 25%, transparent);
+  background-color: color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
-/*
-  Blob crops — the site's signature detail, used on featured /
-  case-study thumbnails only. Varied per instance so they never
-  read as a repeating template element.
-*/
-@utility blob-1 {
-  border-radius: 38% 62% 55% 45% / 45% 40% 60% 55%;
+/* Theme-toggle icon swap: moon shown in light, sun shown in dark */
+html[data-theme="dark"] [data-theme-icon="moon"] {
+  display: none;
 }
-@utility blob-2 {
-  border-radius: 58% 42% 40% 60% / 52% 60% 40% 48%;
-}
-@utility blob-3 {
-  border-radius: 45% 55% 62% 38% / 58% 46% 54% 42%;
-}
-@utility blob-4 {
-  border-radius: 62% 38% 46% 54% / 42% 56% 44% 58%;
+html:not([data-theme="dark"]) [data-theme-icon="sun"] {
+  display: none;
 }
 
 /* Hero entrance initial states — GSAP animates these in.

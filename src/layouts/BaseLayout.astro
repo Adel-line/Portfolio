@@ -9,6 +9,9 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+
+const fontsHref =
+  'https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap';
 ---
 
 <!doctype html>
@@ -27,26 +30,30 @@ const { title, description } = Astro.props;
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Hanken+Grotesk:wght@400;500&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Hanken+Grotesk:wght@400;500&display=swap"
-    />
+    <link rel="preload" as="style" href={fontsHref} />
+    <link rel="stylesheet" href={fontsHref} />
 
     <script is:inline>
-      // Marks JS availability before first paint so entrance animations
+      // Runs before first paint: resolves the theme (stored choice, else
+      // OS preference) and marks JS availability so entrance animations
       // only hide content when a script can reveal it again.
-      document.documentElement.classList.add('js');
+      (() => {
+        let theme;
+        try {
+          theme = localStorage.getItem('theme');
+        } catch {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.classList.add('js');
+      })();
     </script>
   </head>
-  <body class="flex min-h-screen flex-col bg-linen text-ink">
+  <body class="flex min-h-screen flex-col bg-bg text-primary">
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-button focus:bg-rust focus:px-5 focus:py-2.5 focus:font-medium focus:text-linen"
+      class="bg-gradient-brand sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-button focus:px-5 focus:py-2.5 focus:font-display focus:font-semibold focus:text-white"
     >
       Skip to content
     </a>
