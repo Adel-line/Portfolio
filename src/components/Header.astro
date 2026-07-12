@@ -1,17 +1,14 @@
 ---
+// One-page site: links are section anchors (with a leading / so they
+// also work from case-study pages).
 const navItems = [
   { label: 'Projects', href: '/#work' },
-  { label: 'About Me', href: '/about/' },
-  { label: 'Contact', href: '/contact/' },
+  { label: 'About Me', href: '/#about' },
+  { label: 'Contact', href: '/#contact' },
 ];
 
-const currentPath = Astro.url.pathname;
-
-const linkClass = (href: string) =>
-  [
-    'block rounded-button px-3.5 py-2 font-display text-sm font-semibold transition-colors duration-200',
-    currentPath === href ? 'text-accent' : 'text-primary hover:bg-surface-sunken hover:text-accent',
-  ].join(' ');
+const linkClass =
+  'block rounded-button px-3.5 py-2 font-display text-sm font-semibold text-primary transition-colors duration-200 hover:bg-surface-sunken hover:text-accent';
 ---
 
 <header class="sticky top-4 z-40 px-4">
@@ -29,11 +26,7 @@ const linkClass = (href: string) =>
           {
             navItems.map((item) => (
               <li>
-                <a
-                  href={item.href}
-                  aria-current={currentPath === item.href ? 'page' : undefined}
-                  class={linkClass(item.href)}
-                >
+                <a href={item.href} class={linkClass}>
                   {item.label}
                 </a>
               </li>
@@ -98,11 +91,7 @@ const linkClass = (href: string) =>
       {
         navItems.map((item) => (
           <li>
-            <a
-              href={item.href}
-              aria-current={currentPath === item.href ? 'page' : undefined}
-              class={linkClass(item.href)}
-            >
+            <a href={item.href} class={linkClass}>
               {item.label}
             </a>
           </li>

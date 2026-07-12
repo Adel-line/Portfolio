@@ -21,4 +21,4 @@ npm run preview  # serve the build locally
 
 ## Supabase integration point (next pass)
 
-The contact form UI is complete; submission is stubbed in **`src/lib/contact.ts` → `submitContactForm()`**. Replace that function body with the Supabase insert (or edge-function call) — the form page (`src/pages/contact.astro`) already handles pending/success/error states and needs no changes.
+The contact form UI is complete; submission is stubbed in **`src/lib/contact.ts` → `submitContactForm()`**. Replace that function body with the Supabase insert (or edge-function call) — the form (`src/components/ContactSection.astro`, a section on the one-page home) already handles pending/success/error states and needs no changes.

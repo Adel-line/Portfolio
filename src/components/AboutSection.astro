@@ -1,7 +1,6 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ContactCTA from '../components/ContactCTA.astro';
-import Tag from '../components/Tag.astro';
+import SectionHeading from './SectionHeading.astro';
+import Tag from './Tag.astro';
 
 const skillGroups = [
   {
@@ -23,16 +22,15 @@ const skillGroups = [
 ];
 ---
 
-<BaseLayout
-  title="About — Adelina Sahlean"
-  description="UX designer with eight years in fintech, health, and B2B products, relocating from Copenhagen to Switzerland."
->
-  <section class="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-24">
+<section id="about" class="scroll-mt-24 border-y border-border bg-surface-sunken" aria-labelledby="about-heading">
+  <div class="mx-auto max-w-5xl px-5 py-20 sm:px-8">
+    <SectionHeading eyebrow="About me" id="about-heading">
+      Designer first, but fluent in the rest
+    </SectionHeading>
+
     <div class="grid gap-12 lg:grid-cols-[1fr_320px] lg:gap-16">
       <div>
-        <h1 class="font-display text-4xl font-extrabold tracking-tight text-primary">About</h1>
-
-        <div class="mt-8 space-y-5 text-lg text-secondary">
+        <div class="space-y-5 text-lg text-secondary">
           <p>
             I'm Adelina — a UX designer who likes the messy middle of product work:
             the part after "we should improve this" and before anyone knows what
@@ -53,17 +51,17 @@ const skillGroups = [
           </p>
         </div>
 
-        <h2 class="mt-14 font-display text-2xl font-bold tracking-tight text-primary">
+        <h3 class="mt-14 font-display text-xl font-bold tracking-tight text-primary">
           What I'm looking for
-        </h2>
+        </h3>
         <div class="mt-5 space-y-5 text-lg text-secondary">
           <p>
             I'm relocating to Switzerland — a long-planned move, not an experiment,
             with family already in Basel. I'm looking for a senior product design
             role in Zürich, Basel, or Lausanne, in a team where design has a seat in
             decisions and researchers aren't a luxury. Available from
-            <strong>early 2027</strong>, EU citizen (Romanian passport), so the
-            permit process is straightforward.
+            <strong class="font-semibold text-primary">early 2027</strong>, EU
+            citizen (Romanian passport), so the permit process is straightforward.
           </p>
           <p>
             If you're weighing the risk of a relocating candidate: I've done this
@@ -72,14 +70,16 @@ const skillGroups = [
           </p>
         </div>
 
-        <h2 class="mt-14 font-display text-2xl font-bold tracking-tight text-primary">
+        <h3 class="mt-14 font-display text-xl font-bold tracking-tight text-primary">
           Skills and tools
-        </h2>
+        </h3>
         <div class="mt-6 grid gap-8 sm:grid-cols-2">
           {
             skillGroups.map((group) => (
               <div>
-                <h3 class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">{group.name}</h3>
+                <h4 class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">
+                  {group.name}
+                </h4>
                 <ul class="mt-3 flex flex-wrap gap-2">
                   {group.items.map((item) => (
                     <li>
@@ -93,9 +93,9 @@ const skillGroups = [
         </div>
       </div>
 
-      <aside class="lg:pt-20">
+      <aside>
         <div
-          class="mx-auto flex aspect-[4/5] max-w-xs items-center justify-center rounded-card border border-border bg-surface-sunken"
+          class="mx-auto flex aspect-[4/5] max-w-xs items-center justify-center rounded-card border border-border bg-surface"
           role="img"
           aria-label="Portrait of Adelina Sahlean"
         >
@@ -121,7 +121,5 @@ const skillGroups = [
         </dl>
       </aside>
     </div>
-  </section>
-
-  <ContactCTA />
-</BaseLayout>
+  </div>
+</section>

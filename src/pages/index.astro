@@ -4,8 +4,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import CaseStudyCard from '../components/CaseStudyCard.astro';
 import ProcessSnapshot from '../components/ProcessSnapshot.astro';
-import AboutTeaser from '../components/AboutTeaser.astro';
-import ContactCTA from '../components/ContactCTA.astro';
+import AboutSection from '../components/AboutSection.astro';
+import ContactSection from '../components/ContactSection.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 
 const featured = (await getCollection('case-studies', ({ data }) => data.featured)).sort(
@@ -19,7 +19,7 @@ const featured = (await getCollection('case-studies', ({ data }) => data.feature
 >
   <Hero />
 
-  <section class="mx-auto max-w-5xl scroll-mt-20 px-5 py-20 sm:px-8" id="work" aria-labelledby="work-heading">
+  <section class="mx-auto max-w-5xl scroll-mt-24 px-5 py-20 sm:px-8" id="work" aria-labelledby="work-heading">
     <SectionHeading eyebrow="Selected work" id="work-heading">
       Three projects, with the reasoning shown
     </SectionHeading>
@@ -29,6 +29,6 @@ const featured = (await getCollection('case-studies', ({ data }) => data.feature
   </section>
 
   <ProcessSnapshot />
-  <AboutTeaser />
-  <ContactCTA />
+  <AboutSection />
+  <ContactSection />
 </BaseLayout>
