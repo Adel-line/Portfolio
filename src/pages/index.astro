@@ -3,7 +3,6 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import CaseStudyCard from '../components/CaseStudyCard.astro';
-import ProcessSnapshot from '../components/ProcessSnapshot.astro';
 import AboutSection from '../components/AboutSection.astro';
 import ContactSection from '../components/ContactSection.astro';
 import SectionHeading from '../components/SectionHeading.astro';
@@ -28,7 +27,6 @@ const featured = (await getCollection('case-studies', ({ data }) => data.feature
     </div>
   </section>
 
-  <ProcessSnapshot />
   <AboutSection />
   <ContactSection />
 </BaseLayout>

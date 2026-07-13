@@ -1,25 +1,26 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import ProjectPreview from './ProjectPreview.astro';
 
 interface Props {
   study: CollectionEntry<'case-studies'>;
 }
 
 const { study } = Astro.props;
-const { title, outcome, tags } = study.data;
+const { title, outcome, tags, blob, thumb, thumbAlt } = study.data;
 const href = `/case-studies/${study.id}/`;
 ---
 
 <article
-  class="group relative flex aspect-square flex-col rounded-card border border-border bg-surface p-6 transition-all duration-200 hover:-translate-y-1 hover:border-border-strong sm:p-7"
+  class="group relative flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface transition-all duration-200 hover:-translate-y-1 hover:border-border-strong"
 >
-  <p class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">
-    {tags.join(' · ')}
-  </p>
+  <ProjectPreview variant={blob} alt={thumbAlt} thumb={thumb} />
 
-  <div class="mt-auto">
-    <div class="bg-gradient-brand h-11 w-11 rounded-xl" aria-hidden="true"></div>
-    <h3 class="mt-5 font-display text-xl font-bold tracking-tight text-primary">
+  <div class="flex flex-1 flex-col border-t border-border p-6 sm:p-7">
+    <p class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">
+      {tags.join(' · ')}
+    </p>
+    <h3 class="mt-4 font-display text-xl font-bold tracking-tight text-primary">
       <a
         href={href}
         class="transition-colors duration-200 after:absolute after:inset-0 after:content-[''] group-hover:text-accent"
