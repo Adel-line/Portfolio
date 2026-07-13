@@ -1,5 +1,6 @@
 ---
 import Button from './Button.astro';
+import TopoBackground from './TopoBackground.astro';
 ---
 
 <!-- Pulled up behind the sticky nav pill (the header's flow height) so the
@@ -7,7 +8,12 @@ import Button from './Button.astro';
 <section class="relative isolate -mt-14 overflow-hidden">
   <div data-hero-wash class="hero-glow absolute inset-0 -z-10" aria-hidden="true"></div>
 
-  <div class="mx-auto max-w-5xl px-5 pb-20 pt-30 sm:px-8 sm:pb-28 sm:pt-38">
+  <!-- Ambient contour texture in the open right column; masked away from the
+       left where the headline sits. The content below is z-10, so it stacks
+       above the component's own z-0 canvas, which in turn covers the -z-10 glow. -->
+  <TopoBackground side="right" />
+
+  <div class="relative z-10 mx-auto max-w-5xl px-5 pb-20 pt-30 sm:px-8 sm:pb-28 sm:pt-38">
     <p data-hero-fade class="mb-4 font-display text-sm font-semibold uppercase tracking-[0.14em] text-secondary">
       Adelina Sahlean · UX designer
     </p>

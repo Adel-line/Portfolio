@@ -26,6 +26,9 @@
   --nav-border: rgba(27, 24, 18, 0.08);
   --code-bg: #1b1812;
   --code-text: #f2eee4;
+  /* Ambient topo contour ink — the primary text colour, softened by the
+     component's own low alpha so it reads as a faint background texture. */
+  --topo-ink: var(--text-primary);
 }
 
 [data-theme="dark"] {
@@ -44,12 +47,18 @@
   --nav-border: rgba(245, 241, 232, 0.1);
   --code-bg: #0f0d0b;
   --code-text: #f2eee4;
+  --topo-ink: var(--text-primary);
 }
 
 :root {
   /* Shared across both themes. Never full-bleed: mask or constrain it
      (hero glow, primary buttons, nav Resume button, card glyphs). */
   --gradient-brand: linear-gradient(135deg, #e8601c 0%, #d63f6e 55%, #6c3aa6 100%);
+  /* Topo flow/sweep gradient stops — the same brand orange → rose → violet
+     ramp as --gradient-brand, exposed as discrete stops the canvas can read. */
+  --topo-c1: #e8601c;
+  --topo-c2: #d63f6e;
+  --topo-c3: #6c3aa6;
 }
 
 /* Tailwind utility mappings — `inline` so utilities resolve the var()
