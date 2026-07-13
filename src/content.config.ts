@@ -14,6 +14,7 @@ const caseStudies = defineCollection({
     featured: z.boolean().default(false),
     order: z.number().default(99),
     blob: z.enum(['blob-1', 'blob-2', 'blob-3', 'blob-4']).default('blob-1'),
+    thumb: z.string().optional(), // card preview screenshot; falls back to a generated mock
     thumbAlt: z.string(), // alt text for the card thumbnail
   }),
 });

@@ -3,6 +3,8 @@
  * Annotated image slot for case studies. Renders a styled placeholder
  * until a real `src` is provided — captions and alt text stay in place
  * so swapping in final imagery is a one-line change per figure.
+ * `tone` is kept for MDX compatibility; placeholders all render on
+ * the sunken surface token now.
  */
 interface Props {
   alt: string;
@@ -12,29 +14,23 @@ interface Props {
   aspect?: string;
 }
 
-const { alt, caption, src, tone = 'oat', aspect = '16/9' } = Astro.props;
-
-const tones = {
-  oat: 'bg-oat/70',
-  moss: 'bg-moss/25',
-  rust: 'bg-rust/15',
-};
+const { alt, caption, src, aspect = '16/9' } = Astro.props;
 ---
 
 <figure class="my-10">
   <div
-    class:list={['flex items-center justify-center overflow-hidden rounded-card', tones[tone]]}
+    class="flex items-center justify-center overflow-hidden rounded-card border border-border bg-surface-sunken"
     style={`aspect-ratio: ${aspect};`}
   >
     {
       src ? (
         <img src={src} alt={alt} class="h-full w-full object-cover" loading="lazy" />
       ) : (
-        <p role="img" aria-label={alt} class="max-w-md px-6 text-center text-sm text-ink/50">
+        <p role="img" aria-label={alt} class="max-w-md px-6 text-center text-sm text-tertiary">
           [ Image: {alt} ]
         </p>
       )
     }
   </div>
-  {caption && <figcaption class="mt-3 text-sm text-ink/60">{caption}</figcaption>}
+  {caption && <figcaption class="mt-3 font-mono text-xs text-secondary">{caption}</figcaption>}
 </figure>

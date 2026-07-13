@@ -22,7 +22,7 @@ const meta = [
 
 <BaseLayout title={`${title} — Adelina Sahlean`} description={outcome}>
   <article>
-    <header class="border-b border-oat/60 bg-oat-light/60">
+    <header class="border-b border-border bg-surface-sunken">
       <div class="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
         <ul class="mb-5 flex flex-wrap gap-2" aria-label="Project tags">
           {
@@ -33,14 +33,16 @@ const meta = [
             ))
           }
         </ul>
-        <h1 class="font-display text-4xl font-bold tracking-tight">{title}</h1>
-        <p class="mt-4 text-xl text-rust">{outcome}</p>
+        <h1 class="font-display text-4xl font-semibold tracking-tight text-primary">{title}</h1>
+        <p class="mt-4 text-xl text-accent">{outcome}</p>
         <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
           {
             meta.map((item) => (
               <div>
-                <dt class="text-xs font-medium text-moss-deep">{item.label}</dt>
-                <dd class="mt-1 text-sm">{item.value}</dd>
+                <dt class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">
+                  {item.label}
+                </dt>
+                <dd class="mt-1 text-sm text-primary">{item.value}</dd>
               </div>
             ))
           }
@@ -54,12 +56,14 @@ const meta = [
   </article>
 
   <nav aria-label="More case studies" class="mx-auto max-w-3xl px-5 pb-20 sm:px-8">
-    <div class="flex flex-col gap-4 border-t border-oat/60 pt-8 sm:flex-row sm:justify-between">
+    <div class="flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:justify-between">
       {
         prev ? (
           <a href={`/case-studies/${prev.id}/`} class="group max-w-xs">
-            <span class="text-xs font-medium text-moss-deep">Previous</span>
-            <span class="mt-1 block font-display font-bold transition-colors duration-200 group-hover:text-rust">
+            <span class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">
+              Previous
+            </span>
+            <span class="mt-1 block font-display font-bold text-primary transition-colors duration-200 group-hover:text-accent">
               {prev.data.title}
             </span>
           </a>
@@ -70,8 +74,10 @@ const meta = [
       {
         next && (
           <a href={`/case-studies/${next.id}/`} class="group max-w-xs sm:text-right">
-            <span class="text-xs font-medium text-moss-deep">Next</span>
-            <span class="mt-1 block font-display font-bold transition-colors duration-200 group-hover:text-rust">
+            <span class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">
+              Next
+            </span>
+            <span class="mt-1 block font-display font-bold text-primary transition-colors duration-200 group-hover:text-accent">
               {next.data.title}
             </span>
           </a>
@@ -89,6 +95,7 @@ const meta = [
     line-height: var(--text-2xl--line-height);
     font-weight: 700;
     letter-spacing: -0.01em;
+    color: var(--text-primary);
     margin-top: 3rem;
     margin-bottom: 1rem;
   }
@@ -96,13 +103,14 @@ const meta = [
     font-family: var(--font-display);
     font-size: var(--text-xl);
     line-height: var(--text-xl--line-height);
-    font-weight: 700;
+    font-weight: 600;
+    color: var(--text-primary);
     margin-top: 2.25rem;
     margin-bottom: 0.75rem;
   }
   .case-prose p {
     margin-bottom: 1.25rem;
-    color: color-mix(in srgb, var(--color-ink) 88%, transparent);
+    color: var(--text-secondary);
   }
   .case-prose ul,
   .case-prose ol {
@@ -110,7 +118,7 @@ const meta = [
     padding-left: 1.5rem;
     display: grid;
     gap: 0.5rem;
-    color: color-mix(in srgb, var(--color-ink) 88%, transparent);
+    color: var(--text-secondary);
   }
   .case-prose ul {
     list-style: disc;
@@ -119,19 +127,41 @@ const meta = [
     list-style: decimal;
   }
   .case-prose li::marker {
-    color: var(--color-rust);
+    color: var(--accent);
   }
   .case-prose a {
-    color: var(--color-rust);
+    color: var(--accent);
     font-weight: 500;
     text-decoration: underline;
     text-underline-offset: 4px;
   }
   .case-prose a:hover {
-    color: var(--color-rust-deep);
+    color: var(--text-primary);
   }
   .case-prose strong {
-    font-weight: 700;
-    color: var(--color-ink);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .case-prose code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 0.375rem;
+    padding: 0.125rem 0.375rem;
+  }
+  .case-prose pre {
+    font-family: var(--font-mono);
+    background-color: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    overflow-x: auto;
+  }
+  .case-prose pre code {
+    background: none;
+    padding: 0;
+    font-size: var(--text-sm);
   }
 </style>

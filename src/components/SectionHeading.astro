@@ -8,8 +8,14 @@ const { eyebrow, id } = Astro.props;
 ---
 
 <div class="mb-10">
-  {eyebrow && <p class="mb-2 text-sm font-medium text-moss-deep">{eyebrow}</p>}
-  <h2 id={id} class="font-display text-3xl font-bold tracking-tight">
+  {
+    eyebrow && (
+      <p class="mb-2 font-display text-sm font-semibold uppercase tracking-[0.14em] text-secondary">
+        {eyebrow}
+      </p>
+    )
+  }
+  <h2 id={id} class="font-display text-3xl font-bold tracking-tight text-primary">
     <slot />
   </h2>
 </div>

@@ -1,0 +1,161 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import Tag from './Tag.astro';
+
+const skillGroups = [
+  {
+    name: 'Research',
+    items: ['User interviews', 'Contextual inquiry', 'Usability testing', 'Survey design', 'Funnel analysis'],
+  },
+  {
+    name: 'Design',
+    items: ['Interaction design', 'Design systems', 'Prototyping', 'Service blueprints', 'Accessibility (WCAG 2.2)'],
+  },
+  {
+    name: 'Tools',
+    items: ['Figma', 'Maze', 'Lookback', 'Amplitude', 'Fullstory', 'Miro', 'Notion'],
+  },
+  {
+    name: 'Working languages',
+    items: ['English (fluent)', 'Romanian (native)', 'Danish (conversational)', 'German (learning, A2)'],
+  },
+];
+
+const processSteps = [
+  {
+    name: 'Understand',
+    text: 'Interviews, support tickets, and analytics before any screens. I want to know where people give up, and why.',
+  },
+  {
+    name: 'Frame',
+    text: 'One written problem statement the team agrees on. Half of design is deciding what not to build.',
+  },
+  {
+    name: 'Prototype and test',
+    text: 'Rough early, refined late. I test with 5–8 users per round and change course when the evidence says to.',
+  },
+  {
+    name: 'Ship and measure',
+    text: 'I stay close to engineering through build, then check the numbers we said would move. If they didn’t, that’s the next brief.',
+  },
+];
+---
+
+<section id="about" class="scroll-mt-24 border-y border-border bg-surface-sunken" aria-labelledby="about-heading">
+  <div class="mx-auto max-w-5xl px-5 py-20 sm:px-8">
+    <SectionHeading eyebrow="About me" id="about-heading">
+      Designer first, but fluent in the rest
+    </SectionHeading>
+
+    <div class="grid gap-12 lg:grid-cols-[1fr_320px] lg:gap-16">
+      <div>
+        <div class="space-y-5 text-lg text-secondary">
+          <p>
+            I'm Adelina — a UX designer who likes the messy middle of product work:
+            the part after "we should improve this" and before anyone knows what
+            "this" is. I've spent eight years there, mostly in small teams at
+            fintech, health, and B2B companies where the designer does the research,
+            makes the case, and ships the thing.
+          </p>
+          <p>
+            I grew up in Cluj, studied interaction design in Malmö, and have spent
+            the last six years in Copenhagen. The way I work is recognizably
+            Scandinavian: flat teams, direct feedback, decisions written down. I've
+            noticed that translates well to Swiss product culture — precision about
+            problems, skepticism toward decoration.
+          </p>
+          <p>
+            Away from work: I climb (badly), bake rye bread (well), and keep a
+            sketchbook of transit-system diagrams from every city I visit.
+          </p>
+        </div>
+
+        <h3 class="mt-14 font-display text-xl font-bold tracking-tight text-primary">
+          What I'm looking for
+        </h3>
+        <div class="mt-5 space-y-5 text-lg text-secondary">
+          <p>
+            I'm relocating to Switzerland — a long-planned move, not an experiment,
+            with family already in Basel. I'm looking for a senior product design
+            role in Zürich, Basel, or Lausanne, in a team where design has a seat in
+            decisions and researchers aren't a luxury. Available from
+            <strong class="font-semibold text-primary">early 2027</strong>, EU
+            citizen (Romanian passport), so the permit process is straightforward.
+          </p>
+          <p>
+            If you're weighing the risk of a relocating candidate: I've done this
+            move before (Romania → Sweden → Denmark), I interview happily on CET
+            hours, and I can be in Switzerland for a final round within a week.
+          </p>
+        </div>
+
+        <h3 class="mt-14 font-display text-xl font-bold tracking-tight text-primary">
+          How I work
+        </h3>
+        <ol class="mt-6 grid gap-5 sm:grid-cols-2">
+          {
+            processSteps.map((step, i) => (
+              <li class="rounded-card border border-border bg-surface p-5">
+                <p class="font-mono text-2xl font-semibold text-accent" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </p>
+                <h4 class="mt-2 font-display text-lg font-bold text-primary">{step.name}</h4>
+                <p class="mt-2 text-sm text-secondary">{step.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+
+        <h3 class="mt-14 font-display text-xl font-bold tracking-tight text-primary">
+          Skills and tools
+        </h3>
+        <div class="mt-6 grid gap-8 sm:grid-cols-2">
+          {
+            skillGroups.map((group) => (
+              <div>
+                <h4 class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">
+                  {group.name}
+                </h4>
+                <ul class="mt-3 flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <li>
+                      <Tag>{item}</Tag>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <aside>
+        <div
+          class="mx-auto flex aspect-[4/5] max-w-xs items-center justify-center rounded-card border border-border bg-surface"
+          role="img"
+          aria-label="Portrait of Adelina Sahlean"
+        >
+          <p class="px-6 text-center text-sm text-tertiary">[ Photo: Adelina, portrait ]</p>
+        </div>
+        <dl class="mt-8 space-y-4 text-sm">
+          <div>
+            <dt class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">Currently</dt>
+            <dd class="mt-1 text-primary">Copenhagen, Denmark</dd>
+          </div>
+          <div>
+            <dt class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">Relocating to</dt>
+            <dd class="mt-1 text-primary">Zürich / Basel / Lausanne</dd>
+          </div>
+          <div>
+            <dt class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">Available</dt>
+            <dd class="mt-1 text-primary">Early 2027 · EU citizen</dd>
+          </div>
+          <div>
+            <dt class="font-mono text-xs font-medium uppercase tracking-wider text-secondary">Experience</dt>
+            <dd class="mt-1 text-primary">8 years · fintech, health, B2B</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </div>
+</section>
