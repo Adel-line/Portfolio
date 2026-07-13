@@ -1,0 +1,472 @@
+---
+/**
+ * TopoBackground.astro
+ * -------------------------------------------------------------------------
+ * Ambient topographic contour lines for a hero section.
+ *
+ * Elevation is an fbm noise field; a second detail field, gated by a
+ * low-frequency mask, thickens contour density in scattered pockets while the
+ * rest stays open. Contours are traced with marching squares, STITCHED into
+ * continuous polylines, then drawn with quadratic smoothing + round joins so
+ * corners read soft rather than faceted. The whole field is alpha-masked to
+ * one side so the opposite column stays clean for your headline.
+ *
+ * Default animation is "cursor lift": the pointer raises a Gaussian bump in
+ * the elevation field, so contours bunch and bulge underneath it.
+ *
+ * Drop it inside a POSITIONED hero (parent needs position: relative):
+ *
+ *   <section class="hero" style="position:relative">
+ *     <TopoBackground />
+ *     <div class="hero__content"> …headline… </div>
+ *   </section>
+ *
+ * Pass `controls` while tuning to get the mode picker + intensity slider.
+ *
+ * Theming: reads --topo-c1 / --topo-c2 / --topo-c3 (gradient stops used by
+ * flow/sweep) and --topo-ink (line colour) from the cascade, falling back to
+ * orange → rose → violet and near-black / off-white.
+ */
+export interface Props {
+  /** Motion style. Defaults to the chosen "cursor" lift. */
+  mode?: 'cursor' | 'flow' | 'drift' | 'sweep';
+  /** Which side the contours are isolated to. */
+  side?: 'right' | 'left';
+  /** Line presence, 1 (whisper) → 10 (bold). */
+  intensity?: number;
+  /** Show the dev picker + slider. Leave off in production. */
+  controls?: boolean;
+  class?: string;
+}
+
+const {
+  mode = 'cursor',
+  side = 'right',
+  intensity = 5,
+  controls = false,
+  class: className = '',
+} = Astro.props;
+
+const config = JSON.stringify({ mode, side, intensity });
+const modes = [
+  ['cursor', 'Cursor lift'],
+  ['flow', 'Flow lines'],
+  ['drift', 'Terrain drift'],
+  ['sweep', 'Elevation sweep'],
+] as const;
+---
+
+<div class:list={['topo-bg', className]} data-topo data-config={config}>
+  <canvas aria-hidden="true"></canvas>
+
+  {controls && (
+    <div class="topo-controls" role="group" aria-label="Background style">
+      <div class="topo-tabs">
+        {modes.map(([value, label]) => (
+          <button type="button" class:list={['topo-tab', { on: value === mode }]} data-mode={value}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <label class="topo-slider">
+        <span>Intensity</span>
+        <input type="range" min="1" max="10" step="1" value={intensity} data-op aria-label="Line intensity" />
+      </label>
+      <button type="button" class="topo-icon" data-play aria-label="Pause animation">
+        <span data-play-label>Pause</span>
+      </button>
+    </div>
+  )}
+</div>
+
+<style>
+  .topo-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .topo-bg canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .topo-controls {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 8px 10px;
+    border-radius: 999px;
+    pointer-events: auto;
+    background: color-mix(in srgb, var(--topo-panel, #fffbf8) 62%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  }
+  .topo-tabs { display: flex; gap: 4px; }
+  .topo-tab {
+    font: inherit;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--topo-muted, #6b625b);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .topo-tab.on {
+    color: #fff;
+    background: linear-gradient(
+      100deg,
+      var(--topo-c1, #db5a3c),
+      var(--topo-c2, #bf4b7e),
+      var(--topo-c3, #6e4bb0)
+    );
+  }
+  .topo-slider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: var(--topo-muted, #6b625b);
+  }
+  .topo-slider input { width: 84px; }
+  .topo-icon {
+    font: inherit;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    color: var(--topo-muted, #6b625b);
+    background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+</style>
+
+<script>
+  type Pt = [number, number];
+
+  function initTopo(root: HTMLElement) {
+    const canvas = root.querySelector('canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')!;
+    const cfg = JSON.parse(root.dataset.config || '{}');
+
+    let mode: string = cfg.mode || 'cursor';
+    const side: string = cfg.side || 'right';
+    let intensity: number = cfg.intensity ?? 5;
+    let running = true;
+    let visible = true;
+
+    const motionOff = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (motionOff) running = false;
+
+    const mouse = { x: 0, y: 0, on: false };
+    let W = 0, H = 0, dpr = 1, cols = 0, rows = 0;
+    const cell = 14;
+    const LEVELS: number[] = [];
+    for (let i = 0; i < 9; i++) LEVELS.push(0.3 + i * 0.055);
+
+    let staticCache: Pt[][][] | null = null; // flow / drift-still / sweep
+    let cursorCache: Pt[][][] | null = null;
+    let cursorSig = '';
+    let clock = 0, last = performance.now();
+    let colors = readColors();
+
+    function readColors() {
+      const cs = getComputedStyle(root);
+      const dark = isDark();
+      const val = (n: string, fb: string) => cs.getPropertyValue(n).trim() || fb;
+      return {
+        c1: val('--topo-c1', '#db5a3c'),
+        c2: val('--topo-c2', '#bf4b7e'),
+        c3: val('--topo-c3', '#6e4bb0'),
+        ink: val('--topo-ink', dark ? '#f0ebe4' : '#211d1a'),
+        base: dark ? 0.16 : 0.12,
+      };
+    }
+    function isDark() {
+      const d = document.documentElement;
+      const attr = d.getAttribute('data-theme');
+      if (attr === 'dark' || d.classList.contains('dark')) return true;
+      if (attr === 'light') return false;
+      return matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    // --- value-noise fbm ---------------------------------------------------
+    function hash(x: number, y: number) {
+      let n = x * 374761393 + y * 668265263;
+      n = (n ^ (n >> 13)) * 1274126177;
+      return ((n ^ (n >> 16)) >>> 0) / 4294967295;
+    }
+    const sm = (t: number) => t * t * (3 - 2 * t);
+    function vnoise(x: number, y: number) {
+      const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+      const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+      const u = sm(xf), v = sm(yf);
+      return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+    }
+    function fbm(x: number, y: number) {
+      let s = 0, amp = 0.5, fr = 1;
+      for (let o = 0; o < 4; o++) { s += amp * vnoise(x * fr, y * fr); fr *= 2; amp *= 0.5; }
+      return s;
+    }
+
+    function fit() {
+      const r = canvas.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = r.width; H = r.height;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cols = Math.ceil(W / cell) + 1;
+      rows = Math.ceil(H / cell) + 1;
+      staticCache = null; cursorSig = '';
+    }
+
+    // Elevation field. Base terrain + mask-gated high-frequency detail
+    // (denser pockets) + optional pointer bump.
+    function buildField(panx: number, pany: number, bump: { x: number; y: number } | null) {
+      const f = new Float32Array(cols * rows);
+      const sc = 0.0055, scMask = 0.003, scDetail = 0.015;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const wx = c * cell, wy = r * cell;
+          let v = fbm(wx * sc + panx, wy * sc + pany);
+          let m = (fbm(wx * scMask + 13.7, wy * scMask + 4.2) - 0.42) / 0.42;
+          m = Math.max(0, Math.min(1, m)); m *= m;
+          v += m * 0.3 * (fbm(wx * scDetail + 91.3, wy * scDetail + 27.1) - 0.5) * 2;
+          if (bump) {
+            const dx = wx - bump.x, dy = wy - bump.y;
+            v += 0.2 * Math.exp(-(dx * dx + dy * dy) / (2 * 110 * 110));
+          }
+          f[r * cols + c] = v;
+        }
+      }
+      return f;
+    }
+
+    const ipt = (x1: number, y1: number, v1: number, x2: number, y2: number, v2: number, lv: number): Pt => {
+      const t = (lv - v1) / (v2 - v1);
+      return [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t];
+    };
+
+    function segsFor(field: Float32Array, lv: number) {
+      const s: number[] = [];
+      const P = (a: Pt, b: Pt) => { s.push(a[0], a[1], b[0], b[1]); };
+      for (let r = 0; r < rows - 1; r++) {
+        for (let c = 0; c < cols - 1; c++) {
+          const x0 = c * cell, y0 = r * cell, x1 = x0 + cell, y1 = y0 + cell;
+          const tl = field[r * cols + c], tr = field[r * cols + c + 1];
+          const br = field[(r + 1) * cols + c + 1], bl = field[(r + 1) * cols + c];
+          const id = (tl > lv ? 8 : 0) | (tr > lv ? 4 : 0) | (br > lv ? 2 : 0) | (bl > lv ? 1 : 0);
+          if (id === 0 || id === 15) continue;
+          const T = () => ipt(x0, y0, tl, x1, y0, tr, lv);
+          const R = () => ipt(x1, y0, tr, x1, y1, br, lv);
+          const B = () => ipt(x0, y1, bl, x1, y1, br, lv);
+          const L = () => ipt(x0, y0, tl, x0, y1, bl, lv);
+          if (id === 1 || id === 14) P(B(), L());
+          else if (id === 2 || id === 13) P(R(), B());
+          else if (id === 3 || id === 12) P(R(), L());
+          else if (id === 4 || id === 11) P(T(), R());
+          else if (id === 6 || id === 9) P(T(), B());
+          else if (id === 7 || id === 8) P(T(), L());
+          else if (id === 5) { P(T(), R()); P(L(), B()); }
+          else if (id === 10) { P(T(), L()); P(R(), B()); }
+        }
+      }
+      return s;
+    }
+
+    // Walk shared endpoints to join per-cell segments into continuous polylines.
+    function stitch(seg: number[]): Pt[][] {
+      const n = seg.length / 4;
+      if (n === 0) return [];
+      const used = new Uint8Array(n);
+      const map = new Map<string, number[]>();
+      const key = (x: number, y: number) => Math.round(x * 100) + '_' + Math.round(y * 100);
+      const add = (k: string, ref: number) => {
+        const a = map.get(k); if (a) a.push(ref); else map.set(k, [ref]);
+      };
+      for (let i = 0; i < n; i++) {
+        add(key(seg[i * 4], seg[i * 4 + 1]), i * 2);
+        add(key(seg[i * 4 + 2], seg[i * 4 + 3]), i * 2 + 1);
+      }
+      const extend = (pts: Pt[], fwd: boolean) => {
+        while (true) {
+          const e = fwd ? pts[pts.length - 1] : pts[0];
+          const a = map.get(key(e[0], e[1]));
+          if (!a) break;
+          let ns = -1, ne = 0;
+          for (const ref of a) { const s = ref >> 1; if (!used[s]) { ns = s; ne = ref & 1; break; } }
+          if (ns < 0) break;
+          used[ns] = 1;
+          const nx: Pt = ne === 0 ? [seg[ns * 4 + 2], seg[ns * 4 + 3]] : [seg[ns * 4], seg[ns * 4 + 1]];
+          if (fwd) pts.push(nx); else pts.unshift(nx);
+        }
+      };
+      const polys: Pt[][] = [];
+      for (let s = 0; s < n; s++) {
+        if (used[s]) continue;
+        used[s] = 1;
+        const pts: Pt[] = [[seg[s * 4], seg[s * 4 + 1]], [seg[s * 4 + 2], seg[s * 4 + 3]]];
+        extend(pts, true); extend(pts, false);
+        polys.push(pts);
+      }
+      return polys;
+    }
+
+    function contoursFor(field: Float32Array) {
+      const out: Pt[][][] = [];
+      for (const lv of LEVELS) out.push(stitch(segsFor(field, lv)));
+      return out;
+    }
+
+    function grad() {
+      const g = ctx.createLinearGradient(W * 0.4, H, W, 0);
+      g.addColorStop(0, colors.c1);
+      g.addColorStop(0.5, colors.c2);
+      g.addColorStop(1, colors.c3);
+      return g;
+    }
+    // Quadratic-through-midpoints: soft, rounded contours.
+    function strokeSmooth(pts: Pt[]) {
+      if (pts.length < 2) return;
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      if (pts.length === 2) {
+        ctx.lineTo(pts[1][0], pts[1][1]);
+      } else {
+        for (let i = 1; i < pts.length - 1; i++) {
+          const mx = (pts[i][0] + pts[i + 1][0]) / 2;
+          const my = (pts[i][1] + pts[i + 1][1]) / 2;
+          ctx.quadraticCurveTo(pts[i][0], pts[i][1], mx, my);
+        }
+        ctx.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+      }
+      ctx.stroke();
+    }
+
+    function render(cs: Pt[][][]) {
+      ctx.clearRect(0, 0, W, H);
+      const a = colors.base * (intensity / 5);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      if (mode === 'flow' && !motionOff) {
+        ctx.strokeStyle = grad(); ctx.lineWidth = 1.1;
+        ctx.setLineDash([4, 14]); ctx.lineDashOffset = -clock * 0.05;
+        ctx.globalAlpha = a * 1.35;
+        for (const level of cs) for (const poly of level) strokeSmooth(poly);
+        ctx.setLineDash([]);
+      } else if (mode === 'sweep' && !motionOff) {
+        const hi = (Math.sin(clock * 0.0006) * 0.5 + 0.5) * (cs.length - 1);
+        for (let l = 0; l < cs.length; l++) {
+          const d = Math.abs(l - hi), near = d < 1.3;
+          ctx.strokeStyle = near ? grad() : colors.ink;
+          ctx.lineWidth = near ? 1.4 : 1;
+          ctx.globalAlpha = a * (near ? 1.7 - 0.5 * d : 0.9);
+          for (const poly of cs[l]) strokeSmooth(poly);
+        }
+      } else {
+        ctx.strokeStyle = colors.ink; ctx.lineWidth = 1; ctx.globalAlpha = a;
+        for (const level of cs) for (const poly of level) strokeSmooth(poly);
+      }
+
+      ctx.globalAlpha = 1; ctx.setLineDash([]);
+      ctx.globalCompositeOperation = 'destination-in';
+      const mg = ctx.createLinearGradient(0, 0, W, 0);
+      const stops = side === 'left'
+        ? [[0, 1], [0.4, 1], [0.66, 0], [1, 0]]
+        : [[0, 0], [0.34, 0], [0.6, 1], [1, 1]];
+      for (const [pos, alpha] of stops) mg.addColorStop(pos, 'rgba(0,0,0,' + alpha + ')');
+      ctx.fillStyle = mg; ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function frame(t: number) {
+      const dt = t - last; last = t;
+      if (running && visible) clock += dt;
+      if (visible) {
+        let cs: Pt[][][];
+        if (motionOff) {
+          if (!staticCache) staticCache = contoursFor(buildField(0, 0, null));
+          cs = staticCache;
+        } else if (mode === 'drift') {
+          cs = contoursFor(buildField(clock * 0.00004, clock * 0.00002, null));
+        } else if (mode === 'cursor') {
+          const sig = mouse.on ? Math.round(mouse.x) + ',' + Math.round(mouse.y) : 'off';
+          if (sig !== cursorSig) { cursorCache = contoursFor(buildField(0, 0, mouse.on ? mouse : null)); cursorSig = sig; }
+          cs = cursorCache!;
+        } else {
+          if (!staticCache) staticCache = contoursFor(buildField(0, 0, null));
+          cs = staticCache;
+        }
+        render(cs);
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    // --- wiring ------------------------------------------------------------
+    let raf = 0;
+    fit();
+    raf = requestAnimationFrame(frame);
+
+    new ResizeObserver(fit).observe(canvas);
+    new IntersectionObserver(
+      (entries) => { visible = entries[0].isIntersecting; },
+      { threshold: 0 }
+    ).observe(root);
+
+    if (!motionOff) {
+      window.addEventListener('mousemove', (e) => {
+        const r = canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        mouse.on = x >= 0 && x <= r.width && y >= 0 && y <= r.height;
+        mouse.x = x; mouse.y = y;
+      });
+    }
+
+    const reRead = () => { colors = readColors(); };
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', reRead);
+    new MutationObserver(reRead).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['class', 'data-theme'],
+    });
+
+    const tabs = root.querySelector('.topo-tabs');
+    if (tabs) {
+      tabs.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest('.topo-tab') as HTMLElement | null;
+        if (!b) return;
+        mode = b.dataset.mode!;
+        staticCache = null; cursorSig = '';
+        tabs.querySelectorAll('.topo-tab').forEach((x) => x.classList.toggle('on', x === b));
+      });
+    }
+    const op = root.querySelector('[data-op]') as HTMLInputElement | null;
+    if (op) op.addEventListener('input', () => { intensity = +op.value; });
+    const play = root.querySelector('[data-play]') as HTMLButtonElement | null;
+    if (play) {
+      const lbl = play.querySelector('[data-play-label]')!;
+      play.addEventListener('click', () => {
+        running = !running;
+        lbl.textContent = running ? 'Pause' : 'Play';
+        play.setAttribute('aria-label', running ? 'Pause animation' : 'Play animation');
+      });
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-topo]').forEach(initTopo);
+</script>
